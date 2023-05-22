@@ -1,8 +1,10 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include<set>
 using namespace std;
 int money =5000;
+int investment=0;
 class stock
 {
 public:
@@ -31,7 +33,7 @@ public:
 
 vector<stock*> stock_list;
 vector<stock*> stock_portfolio;
-
+set<stock*> s;
 class mrf : public stock
 {
 public:
@@ -60,6 +62,7 @@ public:
             {
             stock_portfolio.push_back(mrf);
             }
+            investment+=n*current_price;
             money-=n*current_price;
         }
         
@@ -92,8 +95,6 @@ public:
                     if (count < n)
                     {
                         v.push_back(i);
-                    // 
-                    // stock_portfolio.pop_back();
                     count++;
                     }
                 
@@ -104,7 +105,7 @@ public:
             {
                 if(i==v[j] && j<n)
                 {
-                    swap(stock_portfolio[i],stock_portfolio.back());
+                    swap(stock_portfolio[i],stock_portfolio[stock_portfolio.size()-(j+1)]);
                     j++;
                 }
             }
@@ -112,6 +113,7 @@ public:
             {
                 stock_portfolio.pop_back();
             }
+            investment-=count*current_price;
             money += (count * current_price);
             }
             else
@@ -122,14 +124,69 @@ public:
 
 
 
-class stock_order
+class s_portfolio
 {
     public:
+    void dashboard()
+    {
+        int current=0;
+        int total_returns=0;
+        
+        int total_gain_per=0;
+        for(int i=0;i<stock_portfolio.size();i++)
+        {
+            current+=stock_portfolio[i]->current_price;
+            total_returns+=stock_portfolio[i]->gain;
+            total_gain_per+=stock_portfolio[i]->gain_percent;
+
+        }
+        cout<<"Current :"<<current<<endl;
+        cout<<"Invested :"<<investment<<endl;
+        if(total_returns>=0)
+        {
+        cout<<"Total Returns :+"<<total_returns<<endl;
+        cout<<"Total Return(%) :+"<<total_gain_per/stock_portfolio.size()<<endl;
+        }
+        else
+        {
+        cout<<"Total Returns :-"<<total_returns<<endl;
+        cout<<"Total Return(%) :-"<<total_gain_per/stock_portfolio.size()<<endl;
+        }
+
+    }
+    void holding()
+    {
+        set<stock*>::iterator it;
+        
+        for(int i=0;i<stock_portfolio.size();i++)
+        {
+            s.insert(stock_portfolio[i]);
+        }
+        vector<stock*> p(s.begin(),s.end());
+
+        for(int i=0;i!=p.size();i++)
+        {
+            int count=0;
+            for(int j=0;j<stock_portfolio.size();j++)
+            {
+                if(p[i]==stock_portfolio[j])
+                count++;
+            }
+            cout<<"Stock :"<<p[i]->name<<endl;
+            cout<<count<<" shares"<<endl;
+            
+        }
+    }
+    
     
 };
 
 class mutual_fund
 {
+    public:
+    int returns;
+    string name;
+    string risk;
 };
 
 int main()
@@ -140,11 +197,17 @@ int main()
     m1->buy(m1,5);
     // for(int i=0;i<stock_portfolio.size();i++)
     // cout<<stock_portfolio[i]->name<<endl;
-    m1->sell(m1,6);
-    for(int i=0;i<stock_portfolio.size();i++)
-    cout<<stock_portfolio[i]->name<<endl;
-    // Add m1 object to the stock_list vector
-    // stock_list.push_back(m1);
+    cout<<money<<endl;
+    m1->current_price=300;
+    cout<<m1->gain<<endl;
+    s_portfolio p1;
+    p1.dashboard();
+    p1.holding();
+    // m1->sell(m1,5);
+    // for(int i=0;i<stock_portfolio.size();i++)
+    // cout<<stock_portfolio[i]->name<<endl;
+
+    
 
     return 0;
 }
